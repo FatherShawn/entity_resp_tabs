@@ -1,0 +1,29 @@
+<?php
+/**
+ * @file entity_resp_tabs.module
+ * 
+ * @author Shawn P. Duncan <shawn@c3design.org>
+ * @date   10/19/14,  8:51 AM
+ *
+ * @brief 
+ *
+ * Copyright 2014 by Shawn P. Duncan.  This code is 
+ * released under the GNU General Public License.
+ * Which means that it is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or (at
+ * your option) any later version.
+ * http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
+ */
+
+/* Implementation of hook_field_formatter_info
+ */
+function entity_resp_tabs_field_formatter_info() {
+  return array(
+    'entity_resp_tabs_default' => array(
+      'label' => t('Horizontal Tabs'),
+      'description' => t('Displays the rendered entity in responsive, horizontal tabs.'),
+      'field types' => array('entityreference'),
+    ),
+  );
+}

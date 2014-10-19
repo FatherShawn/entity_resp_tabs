@@ -1,0 +1,19 @@
+name = Entity Reference Responsive Tabs
+description = Provides a field formatter for entity reference fields to display a multi-value reference field as responsive tabs.
+core = 7.x
+package = Fields
+;  The string value of each dependency must be the module
+;  filename (excluding ".module") and should be written in
+;  lowercase like the examples below. Spaces are not allowed.
+dependencies[] = entityreference
+;  files (Optional) Drupal now supports a dynamic-loading
+;  code registry. To support it, all modules must now declare
+;  any code files containing class or interface declarations
+;  in the .info file, like so:
+;files[] = tests/example.test
+;  configure (Optional) As of version 7.x, the path of the
+;  module's (main) configuration page.
+;  If a module is enabled, a "Configure" and "Permissions" 
+;  link appear. This will be the path of the "Configure" 
+;  link for this particular module on the modules overview page.
+;configure = admin/config/content/example
