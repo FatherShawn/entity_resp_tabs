@@ -1,13 +1,13 @@
 <?php
 /**
  * @file entity_resp_tabs.module
- * 
+ *
  * @author Shawn P. Duncan <shawn@c3design.org>
  * @date   10/19/14,  8:51 AM
  *
- * @brief 
+ * @brief
  *
- * Copyright 2014 by Shawn P. Duncan.  This code is 
+ * Copyright 2014 by Shawn P. Duncan.  This code is
  * released under the GNU General Public License.
  * Which means that it is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,3 +27,49 @@ function entity_resp_tabs_field_formatter_info() {
     ),
   );
 }
+
+/**
+ * Implements hook_field_formatter_prepare_view().
+ * We are dependent on entityreference.module so we use theirs
+ */
+function entity_resp_tabs_field_formatter_prepare_view($entity_type, $entities, $field, $instances, $langcode, &$items, $displays) {
+  entityreference_field_formatter_prepare_view($entity_type, $entities, $field, $instances, $langcode, $items, $displays);
+}
+
+
+
+/**
+ * Implements hook_field_formatter_view().
+ */
+function entity_resp_tabs_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  $content = array();
+  $display['settings']['view_mode'] = 'default'; //@todo implement settings
+  $settings = $display['settings'];
+  // Rebuild the items list to contain only those with access.
+  foreach ($items as $key => $item) {
+    if (empty($item['access'])) {
+      unset($items[$key]);
+    }
+  }
+  foreach ($items as $delta => $item) {
+    // Protect ourselves from recursive rendering.
+    static $depth = 0;
+    $depth++;
+    if ($depth > 20) {
+      throw new EntityReferenceRecursiveRenderingException(t('Recursive rendering detected when rendering entity @entity_type(@entity_id). Aborting rendering.', array(
+        '@entity_type' => $entity_type,
+        '@entity_id' => $item['target_id']
+      )));
+    }
+    $entity = clone $item['entity'];
+    if ($entity_type == 'node') {
+      //$list[$delta] = $entity->title;
+      $entity->title = '';
+    }
+    unset($entity->content);
+    $content[$delta] = entity_view($field['settings']['target_type'], array($item['target_id'] => $entity), $settings['view_mode'], $langcode, TRUE);
+  }
+  return $content;
+}
+
+
