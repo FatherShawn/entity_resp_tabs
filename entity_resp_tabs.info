@@ -6,6 +6,8 @@ package = Fields
 ;  filename (excluding ".module") and should be written in
 ;  lowercase like the examples below. Spaces are not allowed.
 dependencies[] = entityreference
+dependencies[] = libraries
+dependencies[] = jquery_update
 ;  files (Optional) Drupal now supports a dynamic-loading
 ;  code registry. To support it, all modules must now declare
 ;  any code files containing class or interface declarations
@@ -17,3 +19,4 @@ dependencies[] = entityreference
 ;  link appear. This will be the path of the "Configure" 
 ;  link for this particular module on the modules overview page.
 ;configure = admin/config/content/example
+stylesheets[all][] = css/entity_resp_tabs.css

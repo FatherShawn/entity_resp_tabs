@@ -29,6 +29,38 @@ function entity_resp_tabs_field_formatter_info() {
 }
 
 /*
+ * Implementation of hook_libraries_info()
+ * */
+function entity_resp_tabs_libraries_info() {
+  $libraries['Responsive-Tabs'] = array(
+    'name' => 'jQuery Responsive Tabs',
+    'vendor url' => 'https://github.com/jellekralt/Responsive-Tabs/',
+    'download url' => 'https://github.com/jellekralt/Responsive-Tabs/archive/master.zip',
+    'version callback' => 'entity_resp_tabs_lib_version_check',
+    'version arguments' => array(
+      'file' => 'Responsive-Tabs.jquery.json',
+    ),
+    'files' => array(
+      'js' => array('js/jquery.responsiveTabs.min.js'),
+      'css' => array('css/responsive-tabs.css'),
+    ),
+  );
+  return $libraries;
+}
+
+function entity_resp_tabs_lib_version_check($arguments) {
+  $json_file = $arguments['library path'] . '/' . $arguments['version arguments']['file'];
+  $library_info = drupal_json_decode(file_get_contents($json_file));
+  $version_parsed = explode('.', $library_info['version'],4);
+  if ($version_parsed[0] >= 1 && $version_parsed[1] >= 4) {
+    return true;
+  }
+  else {
+    return false;
+  }
+}
+
+/*
  * Implementation of hook_theme to register entity_resp_tabs_field__entityreference()
  * */
 function entity_resp_tabs_theme($existing, $type, $theme, $path) {
@@ -46,6 +78,21 @@ function entity_resp_tabs_theme($existing, $type, $theme, $path) {
  * Implements hook_preprocess_HOOK
  * */
 function entity_resp_tabs_preprocess_field(&$variables) {
+  if (($library = libraries_load('Responsive-Tabs')) && !empty($library['installed'])) {
+    $options = array(
+      'type' => 'file',
+      'scope' => 'footer',
+      'every_page' => false,
+      'group' => JS_DEFAULT,
+    );
+    drupal_add_js(drupal_get_path('module', 'entity_resp_tabs') . "/js/entity_resp_tabs.js", $options);
+  }
+  else {
+    // Something went wrong.
+    // This contains a detailed (localized) error message.
+    $error_message = $library['error message'];
+    watchdog('Entity Responsive Tabs', $error_message, null, WATCHDOG_ERROR);
+  }
   //@todo implement multiple tabs per page with namespaced id
   //$element_id = 'resp-tab-' . drupal_html_class($variables['element']['#field_name']);
   $element_id = 'entity-resp-tab-container';
@@ -53,7 +100,7 @@ function entity_resp_tabs_preprocess_field(&$variables) {
     $variables['element']['#formatter'] == 'entity_resp_tabs_default'
   ) {
     $variables['content_attributes_array'] = array(
-      '#id' => $element_id,
+      'id' => $element_id,
     );
     $count = 1;
     foreach ($variables['items'] as $delta => $item) {
@@ -63,9 +110,8 @@ function entity_resp_tabs_preprocess_field(&$variables) {
       //@todo check for multi-lingual compatibility
       $tab_title = entity_label($entity_type, $variables['element']['#items'][$delta]['entity']);
       $variables['entity_resp_tabs_links'][$delta] = array(
-        '#type' => 'link',
         '#title' => $tab_title,
-        '#href' => '#tab-' . $count,
+        '#fragment' => '#tab-' . $count,
       );
       $count++;
     }
@@ -74,7 +120,6 @@ function entity_resp_tabs_preprocess_field(&$variables) {
 
 function entity_resp_tabs_field__entityreference ($variables) {
   $output = '';
-
   // Render the label, if it's not hidden.
   if (!$variables['label_hidden']) {
     $output .= '<div class="field-label"' . $variables['title_attributes'] . '>' . $variables['label'] . ':&nbsp;</div>';
@@ -86,7 +131,7 @@ function entity_resp_tabs_field__entityreference ($variables) {
   if (isset($variables['entity_resp_tabs_links'])) {
     $output .= '<ul>';
     foreach ($variables['entity_resp_tabs_links'] as $link) {
-      $output .= '<li>' . drupal_render($link) . '</li>';
+      $output .= '<li><a href="' . $link['#fragment'] . '">' . $link['#title'] . '</a></li>';
     }
     $output .= '</ul>';
   }
