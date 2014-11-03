@@ -88,7 +88,6 @@ function entity_resp_tabs_preprocess_field(&$variables) {
     drupal_add_js(drupal_get_path('module', 'entity_resp_tabs') . "/js/entity_resp_tabs.js", $options);
   }
   else {
-    // Something went wrong.
     // This contains a detailed (localized) error message.
     $error_message = $library['error message'];
     watchdog('Entity Responsive Tabs', $error_message, null, WATCHDOG_ERROR);
@@ -189,4 +188,31 @@ function entity_resp_tabs_field_formatter_view($entity_type, $entity, $field, $i
   return $content;
 }
 
+/**
+ *  Implementation of hook_field_formatter_settings_summary().
+ **/
+function entity_resp_tabs_field_formatter_settings_summary($field, $instance, $view_mode) {
+  $display = $instance['display'][$view_mode];
+  $settings = $display['settings'];
+  // initialize summary array
+  $summary = array('nothing yet');
 
+  return implode('<br>', $summary);
+}
+
+/**
+ * Implementation of hook_field_formatter_settings_form().
+ **/
+function entity_resp_tabs_field_formatter_settings_form($field, $instance, $view_mode, $form, &$form_state) {
+  dpm($instance, "instance"); //@todo remove
+  dpm(entity_get_info($instance['entity_type']), "info"); //@todo remove
+  $display = $instance['display'][$view_mode];
+  $info = entity_get_info($instance['entity_type']);
+  $settings = $display['settings'];
+  $form['view_mode'] = array(
+    '#type' => 'select',
+    '#title' => t('Display referenced entity as:'),
+    '#options' => $options,
+    '#default_value' => $settings['thousand_separator'],
+  );
+}
