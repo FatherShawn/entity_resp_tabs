@@ -117,6 +117,9 @@ function entity_resp_tabs_preprocess_field(&$variables) {
   }
 }
 
+/**
+ * Implementation of theme_field()
+ */
 function entity_resp_tabs_field__entityreference ($variables) {
   $output = '';
   // Render the label, if it's not hidden.
@@ -209,10 +212,10 @@ function entity_resp_tabs_field_formatter_settings_form($field, $instance, $view
   $display = $instance['display'][$view_mode];
   $info = entity_get_info($instance['entity_type']);
   $settings = $display['settings'];
-  $form['view_mode'] = array(
-    '#type' => 'select',
-    '#title' => t('Display referenced entity as:'),
-    '#options' => $options,
-    '#default_value' => $settings['thousand_separator'],
-  );
+//  $form['view_mode'] = array(
+//    '#type' => 'select',
+//    '#title' => t('Display referenced entity as:'),
+//    '#options' => $options,
+//    '#default_value' => $settings['thousand_separator'],
+//  );
 }
